@@ -1,6 +1,7 @@
 import { assets } from "@/assets/assets";
 import Image from "next/image";
 import { useClerk, UserButton } from "@clerk/nextjs";
+import { useAppContext } from "@/context/AppContext";
 
 interface SideBarProps {
   expland: boolean;
@@ -9,6 +10,7 @@ interface SideBarProps {
 
 const Sidebar: React.FC<SideBarProps> = ({ expland, setExpland }) => {
   const { openSignIn } = useClerk();
+  const { user } = useAppContext() ?? { user: null };
 
   return (
     <div
@@ -121,12 +123,16 @@ const Sidebar: React.FC<SideBarProps> = ({ expland, setExpland }) => {
         </div>
 
         <div
-          onClick={() => openSignIn()}
+          onClick={user ? undefined : () => openSignIn()}
           className={`flex items-center ${
             expland ? "hover:bg-white/10 rounded-lg" : "justify-center w-full"
           } gap-3 text-white/60 text-sm p-2 mt-2 cursor-pointer`}
         >
-          <Image src={assets.profile_icon} alt="" className="w-7" />
+          {user ? (
+            <UserButton />
+          ) : (
+            <Image src={assets.profile_icon} alt="" className="w-7" />
+          )}
           {expland && <span>My Profile</span>}
         </div>
       </div>
