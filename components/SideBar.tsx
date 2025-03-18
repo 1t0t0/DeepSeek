@@ -51,6 +51,71 @@ const Sidebar: React.FC<SideBarProps> = ({ expland, setExpland }) => {
             </div>
           </div>
         </div>
+
+        <button
+          className={`mt-8 flex items-center justify-center cursor-pointer ${
+            expland
+              ? "bg-primary hover:opacity-90 rounded-2xl gap-2 p-2.5 w-max"
+              : "group-relative h-9 w-9 mx-auto hover:bg-gray-500/30 rounded-lg"
+          }`}
+        >
+          <Image
+            className={expland ? "w-6" : "w-7"}
+            src={expland ? assets.chat_icon : assets.chat_icon_dull}
+            alt=""
+          />
+          <div className="absolute w-max -top-12 -right-12 opacity-0 group-hover:opacity-100 transition bg-black text-white text-sm px-3 py-2 rounded-lg shadow-lg pointer-events-none">
+            New Chat
+            <div className="w-3 h-3 absolute bg-black rotate-45 left-4 -bottom-1.5"></div>
+          </div>
+          {expland && <p className="text-white text font-meduim">New chat</p>}
+        </button>
+
+        <div
+          className={`mt-8 text-white/25 text-sm ${
+            expland ? "block" : "hidden"
+          }`}
+        >
+          <p className="my-1">Recents</p>
+          {/* chatLabel */}
+        </div>
+      </div>
+
+      <div>
+        <div
+          className={`flex items-center cursor-pointer group relative ${
+            expland
+              ? "gap-1 text-white/80 text-sm p-2.5 border border-primary rounded-lg hover:bg-white/10 cursor-pointer"
+              : "h-10 w-10 mx-auto hover:bg-gray-500/30 rounded-lg"
+          }`}
+        >
+          <Image
+            className={expland ? "w-5" : "w-6.5 mx-auto"}
+            src={expland ? assets.phone_icon : assets.phone_icon_dull}
+            alt=""
+          />
+          <div
+            className={`absolute -top-60 pb-8 ${
+              !expland && "-right-40"
+            } opacity-0 group-hover:opacity-100 hidden group-hover:block transition`}
+          >
+            <div className="relative w-max bg-black text-white text-sm p-3 rounded-lg shadow-lg">
+              <Image src={assets.qrcode} alt="" className="w-44" />
+              <p>Scan to get DeepSeek App</p>
+              <div
+                className={`w-3 h-3 absolute bg-black rotate-45 ${
+                  expland ? "right-1/2" : "left-4"
+                } -bottom-1.5`}
+              ></div>
+            </div>
+          </div>
+          {expland && (
+            <>
+              <span>Get App</span>
+              <Image src={assets.new_icon} alt="" />
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
