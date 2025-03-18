@@ -1,4 +1,5 @@
 import { assets } from "@/assets/assets";
+import { Span } from "next/dist/trace";
 import Image from "next/image";
 
 interface SideBarProps {
@@ -115,6 +116,15 @@ const Sidebar: React.FC<SideBarProps> = ({ expland, setExpland }) => {
               <Image src={assets.new_icon} alt="" />
             </>
           )}
+        </div>
+
+        <div
+          className={`flex items-center ${
+            expland ? "hover:bg-white/10 rounded-lg" : "justify-center w-full"
+          } gap-3 text-white/60 text-sm p-2 mt-2 cursor-pointer`}
+        >
+          <Image src={assets.profile_icon} alt="" className="w-7" />
+          {expland && <span>My Profile</span>}
         </div>
       </div>
     </div>
