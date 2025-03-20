@@ -2,15 +2,23 @@ import { assets } from "@/assets/assets";
 import Image from "next/image";
 import { useClerk, UserButton } from "@clerk/nextjs";
 import { useAppContext } from "@/context/AppContext";
+import ChatLabel from "./ChatLabel";
+import { useState } from "react";
 
 interface SideBarProps {
   expland: boolean;
   setExpland: (value: boolean) => void;
 }
 
+interface MenuState {
+  id: number;
+  open: boolean;
+}
+
 const Sidebar: React.FC<SideBarProps> = ({ expland, setExpland }) => {
   const { openSignIn } = useClerk();
   const { user } = useAppContext() ?? { user: null };
+  const [openMenu, setOpenMenu] = useState<MenuState>({ id: 0, open: false });
 
   return (
     <div
@@ -83,6 +91,7 @@ const Sidebar: React.FC<SideBarProps> = ({ expland, setExpland }) => {
         >
           <p className="my-1">Recents</p>
           {/* chatLabel */}
+          <ChatLabel openMenu={openMenu} setOpenMenu={setOpenMenu} />
         </div>
       </div>
 
