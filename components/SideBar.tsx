@@ -33,7 +33,8 @@ const Sidebar: React.FC<SideBarProps> = ({ expland, setExpland }) => {
           }`}
         >
           <Image
-            className={expland ? "w-36" : "w-10"}
+            onClick={() => (expland ? setExpland(true) : setExpland(true))}
+            className={expland ? "w-36" : "w-10 cursor-pointer"}
             src={expland ? assets.logo_text : assets.logo_icon}
             alt=""
           />
@@ -50,7 +51,7 @@ const Sidebar: React.FC<SideBarProps> = ({ expland, setExpland }) => {
             />
             <div
               className={`absolute w-max ${
-                expland ? "leftp1/2 -translate-x-1/2 top-12" : "-top-12 left-0"
+                expland ? "left-1/2 -translate-x-1/2 top-12" : "-top-12 left-0"
               } opacity-0 group-hover:opacity-100 transition bg-black text-white text-sm px-3 py-2 rounded-lg shadow-lg pointer-events-none`}
             >
               {expland ? "Close sidebar" : "Open sidebar"}
