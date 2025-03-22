@@ -16,48 +16,86 @@ interface WebhookEvent {
 }
 
 export async function POST(req: Request) {
-  const wh = new Webhook(process.env.SIGNING_SECRET as string);
-  const headerPayload = await headers();
-  const svixHeaders: Record<string, string> = {
-    "svix-id": headerPayload.get("svix-id") ?? "",
-    "svix-timestamp": headerPayload.get("svix-timestamp") ?? "",
-    "svix-signature": headerPayload.get("svix-signature") ?? "",
-  };
+  try {
+    // ตรวจสอบว่ามี webhook secret หรือไม่
+    const webhookSecret =
+      process.env.CLERK_WEBHOOK_SECRET || process.env.SIGNING_SECRET;
+    if (!webhookSecret) {
+      console.error("Webhook secret is not defined");
+      return NextResponse.json(
+        { error: "Webhook secret is not defined" },
+        { status: 500 }
+      );
+    }
 
-  //Get the payload and verify it
+    // สร้าง Webhook instance
+    const wh = new Webhook(webhookSecret);
 
-  const payload = await req.json();
-  const body = JSON.stringify(payload);
-  const webhookEvent = wh.verify(body, svixHeaders) as WebhookEvent;
-  const { data, type } = webhookEvent;
+    // ดึง headers โดยไม่ใช้ await
+    const headersList = await headers();
+    const svixId = headersList.get("svix-id");
+    const svixTimestamp = headersList.get("svix-timestamp");
+    const svixSignature = headersList.get("svix-signature");
 
-  //Pepare the user data to be saved in the database`
+    // ตรวจสอบว่ามี headers ที่จำเป็นหรือไม่
+    if (!svixId || !svixTimestamp || !svixSignature) {
+      console.error("Missing required Svix headers");
+      return NextResponse.json(
+        { error: "Missing required Svix headers" },
+        { status: 400 }
+      );
+    }
 
-  const userData = {
-    _id: data.id,
-    email: data.email_addresses[0].email_address,
-    name: `${data.first_name} ${data.last_name}`,
-    image: data.image_url,
-  };
+    const svixHeaders = {
+      "svix-id": svixId,
+      "svix-timestamp": svixTimestamp,
+      "svix-signature": svixSignature,
+    };
 
-  await connectDB();
+    // ดึงและตรวจสอบ payload
+    const payload = await req.json();
+    const body = JSON.stringify(payload);
+    const webhookEvent = wh.verify(body, svixHeaders) as WebhookEvent;
+    const { data, type } = webhookEvent;
 
-  switch (type) {
-    case "user.created":
-      await User.create(userData);
-      break;
+    // เตรียมข้อมูลผู้ใช้
+    const userData = {
+      _id: data.id,
+      email: data.email_addresses[0].email_address,
+      name: `${data.first_name} ${data.last_name}`,
+      image: data.image_url,
+    };
 
-    case "user.updated":
-      await User.findByIdAndUpdate(data.id, userData);
-      break;
+    await connectDB();
 
-    case "user.deleted":
-      await User.findByIdAndDelete(data.id);
-      break;
+    switch (type) {
+      case "user.created":
+        await User.create(userData);
+        break;
 
-    default:
-      break;
+      case "user.updated":
+        await User.findByIdAndUpdate(data.id, userData);
+        break;
+
+      case "user.deleted":
+        await User.findByIdAndDelete(data.id);
+        break;
+
+      default:
+        break;
+    }
+
+    return NextResponse.json({ message: "Event received" });
+  } catch (error: unknown) {
+    console.error("Webhook error:", error);
+
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    } else {
+      return NextResponse.json(
+        { error: "Unknown error occurred" },
+        { status: 400 }
+      );
+    }
   }
-
-  return NextResponse.json({ message: "Event recieved" });
 }
