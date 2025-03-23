@@ -16,6 +16,7 @@ export async function POST(req: NextRequest) {
 
     const { chatId, name } = await req.json();
     //connect to the database and update the chat name
+    await connectDB();
     await Chat.findOneAndUpdate({ _id: chatId, userId }, { name });
 
     return NextResponse.json({ success: true, message: "Chat Renamed" });
