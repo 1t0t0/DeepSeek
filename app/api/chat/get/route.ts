@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     await connectDB();
     await Chat.find({ userId });
 
-    return NextResponse.json({ success: true, message: "Chat created" });
+    return NextResponse.json({ success: true });
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
